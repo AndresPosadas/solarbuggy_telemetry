@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Suggestions</title>
+</head>
+
+<body>
+
+Enter GPS Coords: <br>
+Longitude:<input type="text" id="longitude"></input>
+Latitude:<input type="text" id="latitude"></input>
+<br>
+<button type="button" id="submitcoords">Click Me!</button>
+<br>
+Try Me: <input type="text" id="search_form_input"></input>
+
+<div id="place_for_suggestions"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script>
+
+setInterval(function(){ 
+  $.ajax({
+      url: "/update",
+      type: "get",
+      success: function(response) {
+        $("#place_for_suggestions").html(response);
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+      }
+    });
+}, 3000);
+
+$("#submitcoords").click(function(){
+    var long = $("longitude").val();
+    var lat = $("latitude").val();
+
+    console.log('Making the callout~');
+
+    $.ajax({
+      url: "/coords",
+      type: "post",
+      data: {longitude: long, latitude: lat},
+      success: function(response) {
+        console.log('response');
+        // $("#place_for_suggestions").html(response);
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+      }
+    });
+});
+
+// $("#search_form_input").keyup(function(){
+//     var text = $(this).val();
+
+//     $.ajax({
+//       url: "/update",
+//       type: "get",
+//       data: {jsdata: text},
+//       success: function(response) {
+//         $("#place_for_suggestions").html(response);
+//       },
+//       error: function(xhr) {
+//         //Do Something to handle error
+//       }
+//     });
+// });
+</script>
+
+</body>
+
+</html>
