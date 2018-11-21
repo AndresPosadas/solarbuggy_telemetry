@@ -8,15 +8,17 @@
 
 <body>
 
-Enter GPS Coords: <br>
+Enter GPS Coords: 
+<br>
+<br>
 Longitude:<input type="text" id="longitude"></input>
 Latitude:<input type="text" id="latitude"></input>
 <br>
-<button type="button" id="submitcoords">Click Me!</button>
+<button type="button" id="submitcoords">Submit</button>
 <br>
-Try Me: <input type="text" id="search_form_input"></input>
+<br>
 
-<div id="place_for_suggestions"></div>
+<div id="telemetry"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
@@ -27,19 +29,28 @@ setInterval(function(){
       url: "/update",
       type: "get",
       success: function(response) {
-        $("#place_for_suggestions").html(response);
+        $("#telemetry").html(response);
       },
       error: function(xhr) {
         //Do Something to handle error
       }
     });
-}, 3000);
+}, 500);
 
 $("#submitcoords").click(function(){
-    var long = $("longitude").val();
-    var lat = $("latitude").val();
+    var long = $("#longitude").val();
+    var lat = $("#latitude").val();
 
-    console.log('Making the callout~');
+    temp = {
+      data: {
+        longitude: long,
+        latitude: lat,
+      }
+    };
+
+    console.log("Long: " + temp.data.longitude);
+    console.log("Lat: " + temp.data.latitude);
+
 
     $.ajax({
       url: "/coords",
@@ -47,7 +58,6 @@ $("#submitcoords").click(function(){
       data: {longitude: long, latitude: lat},
       success: function(response) {
         console.log('response');
-        // $("#place_for_suggestions").html(response);
       },
       error: function(xhr) {
         //Do Something to handle error
@@ -55,21 +65,6 @@ $("#submitcoords").click(function(){
     });
 });
 
-// $("#search_form_input").keyup(function(){
-//     var text = $(this).val();
-
-//     $.ajax({
-//       url: "/update",
-//       type: "get",
-//       data: {jsdata: text},
-//       success: function(response) {
-//         $("#place_for_suggestions").html(response);
-//       },
-//       error: function(xhr) {
-//         //Do Something to handle error
-//       }
-//     });
-// });
 </script>
 
 </body>

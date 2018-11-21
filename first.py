@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-import requests
-from bs4 import BeautifulSoup
-
+import json
 
 app = Flask(__name__)
-
 
 @app.route('/')
 def index():
@@ -12,36 +9,34 @@ def index():
 
 @app.route('/update') 
 def update():
-	suggestions_list = []
-	file = open('./data.txt')
-	lines = file.readlines()
-	for line in lines:
-		suggestions_list.append(line)
-	return render_template('suggestions.html', suggestions=suggestions_list)
+    coordinates_file = open('/home/odroid/catkin_buggy2/src/solar_buggy/settings/telemetry.json')
+    coordinates_object = json.loads(coordinates_file.read())
+
+    speed = coordinates_object['speed']
+    acceleration = coordinates_object['acceleration']
+    bearing = coordinates_object['bearing']
+    longitude = coordinates_object['longitude']
+    latitude = coordinates_object['latitude']
+
+    suggestions_list = []
+    for statistic in coordinates_object:
+        suggestions_list.append(statistic + ': ' + str(coordinates_object[statistic]))
+    
+    return render_template('suggestions.html', suggestions=suggestions_list)
 
 @app.route('/coords', methods = ['POST']) 
 def coords():
-	print 'Hello!'
-	print 'The coordinates: ', request
-	return jsonify({'data': 'ohkay'}), 201
+    coordinates_file = open('/home/odroid/catkin_buggy2/src/solar_buggy/settings/initial_coordinates.json', 'w')
+    coordinates_object = {}
 
-@app.route('/suggestions')
-def suggestions():
-    text = request.args.get('jsdata')
+    coordinates_object['longitude'] = float(request.form.get('longitude'))
+    coordinates_object['latitude'] = float(request.form.get('latitude'))
 
-    suggestions_list = []
+    coordinates_string = json.dumps(coordinates_object)
 
-    if text:
-        r = requests.get('http://suggestqueries.google.com/complete/search?output=toolbar&hl=ru&q={}&gl=in'.format(text))
+    coordinates_file.write(coordinates_string)
 
-        soup = BeautifulSoup(r.content, 'lxml')
-
-        suggestions = soup.find_all('suggestion')
-
-        for suggestion in suggestions:
-            suggestions_list.append(suggestion.attrs['data'])
-
-    return render_template('suggestions.html', suggestions=suggestions_list)
+    return jsonify({'response': 'OK'}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

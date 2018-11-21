@@ -5,3 +5,7 @@ deactivate/*
 # Python #
 ##########
 *.pyc
+
+# Miscellaneous #
+#################
+templates/.index.html.swp
